@@ -1,0 +1,6 @@
+/data/
+backend/*.pyc
+backend/__pycache__
+backend/db.sqlite3
+backend/env
+backend/*.env
