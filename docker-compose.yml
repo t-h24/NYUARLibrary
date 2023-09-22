@@ -24,9 +24,6 @@ services:
     ports:
       - '3000:3000'
 
-    volumes:
-      - ./frontend:/app/frontend
-
     depends_on:
       - backend
 
