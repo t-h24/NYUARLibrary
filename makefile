@@ -1,8 +1,8 @@
-tests:
+build:
 	docker compose up --build
 
 migrate:
-	docker compose exec python manage.py migrate
+	docker compose exec backend python manage.py migrate
 
 makemigrations:
-	docker compose exec python manage.py makemigrations
+	docker compose exec backend python manage.py makemigrations
