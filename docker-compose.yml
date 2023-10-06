@@ -24,8 +24,12 @@ services:
     ports:
       - '3000:3000'
 
+    environment:
+      - WATCHPACK_POLLING=true
+
     volumes:
       - ./frontend:/app/frontend
+      - /app/frontend/node_modules
     
     depends_on:
       - backend
