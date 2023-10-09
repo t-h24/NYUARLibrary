@@ -1,14 +1,17 @@
 {
-    "portsAttributes": {
-        "3000": {
-          "label": "React"
-        },
-        "5432": {
-          "label": "Database"
-        },
-        "8000": {
-          "label": "Django"
-        }
-    },
-    "forwardPorts": [3000, 5432, 8000]
+  "portsAttributes": {
+      "3000": {
+        "label": "React"
+      },
+      "5432": {
+        "label": "Database"
+      },
+      "8000": {
+        "label": "Django"
+      },
+      "8080": {
+        "label": "pgAdmin"
+      }
+  },
+  "forwardPorts": [3000, 5432, 8000, 8080]
 }
