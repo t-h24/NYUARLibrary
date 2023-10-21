@@ -55,6 +55,20 @@ services:
     depends_on:
       - db
 
+  pgadmin:
+    image: dpage/pgadmin4
+    ports:
+      - '8080:80'
+
+    environment:
+      PGADMIN_DEFAULT_EMAIL: postgres@postgres.com
+      PGADMIN_DEFAULT_PASSWORD: postgres
+      PGADMIN_CONFIG_PROXY_X_HOST_COUNT: 1
+      PGADMIN_CONFIG_PROXY_X_PREFIX_COUNT: 1
+      PGADMIN_CONFIG_ENHANCED_COOKIE_PROTECTION: "False"
+
+    depends_on:
+      - db
 
 
 
@@ -62,7 +76,7 @@ services:
 
 
 #We start by mentioning the version of docker-compose.
-#And create three services: Database (db), Frontend React (frontend), Backend Django (backend)
+#And create four services: Database (db), Frontend React (frontend), Backend Django (backend), and pgAdmin (pgadmin).
 #For db we point it to the official postgres image, set environment variables, set volumes, and expose ports 5432:5432
 #Also for frontend and backend we provide the build context i.e. the dockerfile to use for building the image expose ports 8000:8000 for backend and 3000:3000 for frontend.
 #Set volumes to map ./frontend and ./backend inside the container.
