@@ -18,6 +18,15 @@ from django.urls import path, include
 from . import views
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('test/', include('test.urls')),
+    path('checkRoomAvailability/<slug:roomId>/', views.checkRoomAvailability),
+    path('createRoom/', views.create_room),
+    path('createLibrary/', views.create_library),
+    path('createStudent/', views.create_student),
+    path('getAllRooms/', views.get_all_rooms),
+    path('getAllReservations/', views.get_all_reservations),
+    path('getAllReservations/active/', views.get_all_reservations),
+    path('createReservation/', views.create_reservation),
+    path('adminUpdateBuffer/', views.adminUpdateBuffer),
+    path('clearAllTimeSlots/', views.clearAllTimeSlots),
+
 ]

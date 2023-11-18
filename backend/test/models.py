@@ -6,11 +6,11 @@ from django.db import models
 class Reservations(models.Model):
     reservationID = models.AutoField(primary_key=True)
     libraryName = models.CharField(max_length=100)
-    roomId = models.IntegerField()
+    roomId = models.CharField(max_length=10)
     date = models.DateField()
     startTime = models.TimeField()
     endTime = models.TimeField()
-    studentId = models.ForeignKey('Student', on_delete=models.CASCADE)
+    studentId = models.ForeignKey('Student', on_delete=models.CASCADE, null=True, blank=True)
 
 # Create student model with email and phone number
 class Student(models.Model):
@@ -32,6 +32,8 @@ class Room(models.Model):
     minCapacity = models.IntegerField()
     maxCapacity = models.IntegerField()
     noiseLevel = models.IntegerField()
+    openTime = models.TimeField()
+    closeTime = models.TimeField()
 
 # Create amenities model with room id and amenity name (both primary keys, with roomId being a foreign key)
 class Amenities(models.Model):
