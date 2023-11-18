@@ -169,6 +169,7 @@ def create_student(request):
 
     return Response()
 
+# Raises a error, but still makes the objects.  Figure out later
 @api_view(['POST'])
 def adminUpdateBuffer(request):
     today = datetime.date.today()
