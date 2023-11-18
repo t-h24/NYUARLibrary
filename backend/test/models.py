@@ -10,7 +10,7 @@ class Reservations(models.Model):
     date = models.DateField()
     startTime = models.TimeField()
     endTime = models.TimeField()
-    studentId = models.ForeignKey('Student', on_delete=models.CASCADE)
+    studentId = models.ForeignKey('Student', on_delete=models.CASCADE, null=True, blank=True)
 
 # Create student model with email and phone number
 class Student(models.Model):
