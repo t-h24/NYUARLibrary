@@ -20,4 +20,5 @@ from . import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('test/', include('test.urls')),
+    path('connecttest/', views.send_some_data),
 ]
