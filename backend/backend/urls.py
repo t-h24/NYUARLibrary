@@ -21,4 +21,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('test/', include('test.urls')),
     path('connecttest/', views.send_some_data),
+    path('reservations/', views.get_all_reservations),
 ]
