@@ -1,5 +1,6 @@
 import json
 from django.shortcuts import render
+from django.db.utils import IntegrityError
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from . import models
@@ -69,7 +70,11 @@ def create_reservation(request):
     try:
         student = models.Student.objects.get(pk=content['studentId'])
         print(f'{student}')
+        room = models.Room.objects.get(roomId=content['roomId'])
+        print(f'{room=}')
     except models.Student.DoesNotExist as ex:
+        raise ex
+    except models.Room.DoesNotExist as ex:
         raise ex
     
     
@@ -77,6 +82,10 @@ def create_reservation(request):
     date_dt = datetime.date(year, month, day)
     startTime = datetime.time(content["startHour"], content["startMinute"])
     endTime = datetime.time(content["endHour"], content["endMinute"])
+    if date_dt < datetime.date.today() or \
+        date_dt == datetime.date.today and startTime < datetime.datetime.now().time():
+        raise ValueError("Requested date is already past")
+    
     
     
     reservations = list(models.Reservations.objects.filter(
@@ -177,7 +186,7 @@ def adminUpdateBuffer(request):
     earliest = pastReservations.first()
     noEntries = False
     if earliest is None:
-        daysElapsed = TOTAL_BUFFER_DAYS
+        daysElapsed = datetime.timedelta(days=TOTAL_BUFFER_DAYS)
         noEntries = True
     else:
         daysElapsed = today - earliest.date
@@ -196,8 +205,9 @@ def adminUpdateBuffer(request):
     rooms = models.Room.objects.all()
     newReservations = []
     for room in rooms:
-        for i in range(daysElapsed):
-            newReservations.append(models.Reservations.objects.create(               libraryName=room.libraryName,
+        for i in range(int(daysElapsed/datetime.timedelta(days=1))):
+            newReservations.append(models.Reservations.objects.create(               
+                libraryName=room.libraryName,
                 roomId=room.roomId,
                 date=latest + datetime.timedelta(days=i),
                 startTime=room.openTime,
@@ -205,7 +215,10 @@ def adminUpdateBuffer(request):
                 studentId=None
             ))
     print(newReservations)
-    models.Reservations.objects.bulk_create(newReservations)
+    try:
+        models.Reservations.objects.bulk_create(newReservations)
+    except IntegrityError:
+        pass
     
     return Response()
     
