@@ -85,6 +85,8 @@ def create_reservation(request):
         date=date_dt,
         startTime__lte=startTime,
         endTime__gte=endTime))
+
+    print('skibidi gyatt '+str(reservations))
     
     if len(reservations) != 1:
         raise ValueError("Section is already reserved/is not open at this time")
@@ -152,6 +154,15 @@ def get_all_active_reservations(request):
     res = models.Reservations.objects.filter(studentId=None).values()
     return Response(res)
 
+@api_view(['GET'])
+def get_all_student_reservations(request):
+    res=models.Reservations.objects.filter(studentId__isnull=False).values()
+    return Response(res)
+
+@api_view(['GET'])
+def get_reservations_in_time_range(request,start_time,end_time):
+    pass
+
 @api_view(['POST'])
 def create_student(request):
     """
@@ -177,7 +188,7 @@ def adminUpdateBuffer(request):
     earliest = pastReservations.first()
     noEntries = False
     if earliest is None:
-        daysElapsed = TOTAL_BUFFER_DAYS
+        daysElapsed = int(datetime.timedelta(days=TOTAL_BUFFER_DAYS).total_seconds()//86400)
         noEntries = True
     else:
         daysElapsed = today - earliest.date
