@@ -24,8 +24,9 @@ urlpatterns = [
     path('createStudent/', views.create_student),
     path('getAllRooms/', views.get_all_rooms),
     path('getAllReservations/', views.get_all_reservations),
-    path('getAllReservations/active/', views.get_all_reservations),
+    path('getAllReservations/active/', views.get_all_active_reservations),
     path('createReservation/', views.create_reservation),
+    path('deleteReservation/', views.delete_reservation),
     path('adminUpdateBuffer/', views.adminUpdateBuffer),
     path('clearAllTimeSlots/', views.clearAllTimeSlots),
 
