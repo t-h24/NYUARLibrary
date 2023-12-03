@@ -5,6 +5,7 @@ from rest_framework.decorators import api_view
 from . import models
 from .utils.fcns import *
 import datetime
+from datetime import datetime
 import random
 # Create your views here.
 
@@ -161,7 +162,16 @@ def get_all_student_reservations(request):
 
 @api_view(['GET'])
 def get_reservations_in_time_range(request,start_time,end_time):
-    pass
+    dt_start=datetime.strptime(start_time,"%Y-%m-%dT%H:%M:%S")
+    dt_end=datetime.strptime(end_time,"%Y-%m-%dT%H:%M:%S")
+    res=models.Reservations.objects.filter(
+        studentId__isnull=False,
+        date__gte=dt_start,
+        date__lte=dt_end,
+        startTime__gte=dt_start,
+        endTime__lte=dt_end
+    ).values()
+    return Response(res)
 
 @api_view(['POST'])
 def create_student(request):
