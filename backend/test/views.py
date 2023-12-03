@@ -162,14 +162,21 @@ def get_all_student_reservations(request):
 
 @api_view(['GET'])
 def get_reservations_in_time_range(request,start_time,end_time):
-    dt_start=datetime.strptime(start_time,"%Y-%m-%dT%H:%M:%S")
-    dt_end=datetime.strptime(end_time,"%Y-%m-%dT%H:%M:%S")
+    print(start_time)
+    dt_start=dt_end=None
+    try:
+        dt_start=datetime.strptime(start_time,"%Y-%m-%dT%H:%M:%S")
+        dt_end=datetime.strptime(end_time,"%Y-%m-%dT%H:%M:%S")
+    except:
+        raise ValueError("Invalid datetime format")
+    if dt_start>=dt_end:
+        raise ValueError("Start date & time must come before end date & time")
     res=models.Reservations.objects.filter(
         studentId__isnull=False,
         date__gte=dt_start,
         date__lte=dt_end,
         startTime__gte=dt_start,
-        endTime__lte=dt_end
+        endTime__lte=dt_end,
     ).values()
     return Response(res)
 
