@@ -29,5 +29,5 @@ urlpatterns = [
     path('deleteReservation/', views.delete_reservation),
     path('adminUpdateBuffer/', views.adminUpdateBuffer),
     path('clearAllTimeSlots/', views.clearAllTimeSlots),
-
+      path('reservations/', views.get_all_reservations_for_a_student),
 ]
