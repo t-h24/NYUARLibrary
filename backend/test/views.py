@@ -231,7 +231,7 @@ def get_all_reservations(request):
     return Response(res)
 
 @api_view(['GET'])
-def get_all_available_reservations(request):
+def get_all_active_reservations(request):
     res = models.Reservations.objects.exclude(studentId_id=None).values()
     return Response(res)
 
