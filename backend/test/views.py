@@ -8,6 +8,7 @@ from .utils.fcns import *
 import datetime
 from datetime import datetime
 import random
+
 # Create your views here.
 
 UNAVAILABLE = None
@@ -343,3 +344,17 @@ def adminUpdateBuffer(request):
 def clearAllTimeSlots(request):
     models.Reservations.objects.all().delete()
     return Response()
+
+
+# get all reservations of a specific student 
+# sample url: http://localhost:8000/reservations/?studentId=123456
+@api_view(['GET'])
+def get_all_reservations_for_a_student(request):
+    """
+    Requires studentId as query string
+    """
+    studentId = request.GET.get('studentId')
+    reservations = models.Reservations.objects.filter(studentId=studentId)
+    return Response(reservations)
+    
+    
