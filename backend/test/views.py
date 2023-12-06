@@ -239,11 +239,6 @@ def get_all_active_reservations(request):
     return Response(res)
 
 @api_view(['GET'])
-def get_all_student_reservations(request):
-    res=models.Reservations.objects.filter(studentId__isnull=False).values()
-    return Response(res)
-
-@api_view(['GET'])
 def get_reservations_in_time_range(request,start_time,end_time):
     print(start_time)
     dt_start=dt_end=None
