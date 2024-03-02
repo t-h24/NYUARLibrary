@@ -1,6 +1,7 @@
 import json
 from django.shortcuts import render
 from django.db.utils import IntegrityError
+from django.db.models import Q
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from . import models
@@ -356,4 +357,24 @@ def get_all_reservations_for_a_student(request):
     reservations = models.Reservations.objects.filter(studentId=studentId)
     return Response(reservations)
     
-    
+
+# returns a QuerySet of rooms that are not booked within
+# rsrvStart and rsrvEnd times
+@api_view(['GET'])
+def get_available_rooms(request, rsrvDate, rsrvStart, rsrvEnd):
+    # conditions checked:
+    #   the reservation starts within [rsrvStart, rsrvEnd]
+    #   the reservation ends within [rsrvStart, rsrvEnd]
+    #   the reservations starts before rsrvStart and ends after rsrvEnd
+    unavailable = models.Reservations.objects.filter(
+        Q(  Q(startTime__gte = rsrvStart, startTime__lte = rsrvEnd) 
+            | Q(endTime__gte = rsrvStart, endTime__lte = rsrvEnd)
+            | Q(startTime__lte = rsrvStart, endTime__gte = rsrvEnd)
+        ),
+        date=rsrvDate
+    ).values_list('roomId', flat=True)
+
+
+    available = models.Room.objects.all().exclude(roomId__in=unavailable)
+
+    return Response(available)
