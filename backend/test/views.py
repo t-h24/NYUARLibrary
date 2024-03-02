@@ -6,7 +6,6 @@ from rest_framework.decorators import api_view
 from . import models
 from .utils.fcns import *
 import datetime
-from datetime import datetime
 import random
 
 # Create your views here.
