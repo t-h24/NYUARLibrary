@@ -358,18 +358,37 @@ def get_all_reservations_for_a_student(request):
     return Response(reservations)
     
 
-# returns a QuerySet of rooms that are not booked within
-# rsrvStart and rsrvEnd times
+
 @api_view(['GET'])
-def get_available_rooms(request, rsrvDate, rsrvStart, rsrvEnd):
-    # conditions checked:
-    #   the reservation starts within [rsrvStart, rsrvEnd]
-    #   the reservation ends within [rsrvStart, rsrvEnd]
-    #   the reservations starts before rsrvStart and ends after rsrvEnd
+def get_available_rooms(request):
+    """
+    returns a QuerySet of rooms that are not booked within
+    a specified start and end time
+
+    Requires date, startHour, startMinute, endHour, endMinute
+        !date must be formatted as year-month-day
+    """
+    body_unicode = request.body.decode('utf-8')
+    body = json.loads(body_unicode)
+    content = body['content']
+    print(f'{content=}')
+
+    startTime = datetime.time(content[["startHour"], content["startMinute"]])
+    endTime = datetime.time(content["endHour"], content["endMinute"])
+
+    year, month, day = [int(x) for x in content['date'].split('-')]
+    rsrvDate = datetime.date(year, month, day)
+
+    """
+    conditions checked to determine if a room is unavailable:
+      the reservation starts within [startTime, endTime]
+      the reservation ends within [startTime, endTime]
+      the reservations starts before startTime and ends after endTime
+    """
     unavailable = models.Reservations.objects.filter(
-        Q(  Q(startTime__gte = rsrvStart, startTime__lte = rsrvEnd) 
-            | Q(endTime__gte = rsrvStart, endTime__lte = rsrvEnd)
-            | Q(startTime__lte = rsrvStart, endTime__gte = rsrvEnd)
+        Q(  Q(startTime__gte = startTime, startTime__lte = endTime) 
+            | Q(endTime__gte = startTime, endTime__lte = endTime)
+            | Q(startTime__lte = startTime, endTime__gte = endTime)
         ),
         date=rsrvDate
     ).values_list('roomId', flat=True)
