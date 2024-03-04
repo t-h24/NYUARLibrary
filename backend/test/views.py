@@ -60,7 +60,7 @@ def create_room(request):
 def create_reservation(request):
     """
     Requires roomId, libraryName, type, minCapacity, maxCapacity
-    noiseLevel, startHour, endHour, startMinute, endMinute
+    noiseLevel, date, startHour, endHour, startMinute, endMinute
     in request body 
     """
     body_unicode = request.body.decode('utf-8')
