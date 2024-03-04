@@ -141,7 +141,7 @@ def create_reservation(request):
 @api_view(['DELETE'])
 def delete_reservation(request):
     """
-    Requires startHour, endHour, startMinute, endMinute, and studentId
+    Requires date, startHour, endHour, startMinute, endMinute, and studentId
     in request body 
     """
     body_unicode = request.body.decode('utf-8')
