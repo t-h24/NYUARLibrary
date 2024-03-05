@@ -373,7 +373,7 @@ def get_available_rooms(request):
     content = body['content']
     print(f'{content=}')
 
-    startTime = datetime.time(content[["startHour"], content["startMinute"]])
+    startTime = datetime.time(content["startHour"], content["startMinute"])
     endTime = datetime.time(content["endHour"], content["endMinute"])
 
     year, month, day = [int(x) for x in content['date'].split('-')]
