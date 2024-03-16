@@ -15,21 +15,28 @@ UNAVAILABLE = None
 MAX_RESERVATION_ID = 100000000
 TOTAL_BUFFER_DAYS = 5
 
+@api_view(['POST'])
+def create_library(request):
+    """
+    Requires libraryName, location, phone in request body
+    """
+    body_unicode = request.body.decode('utf-8')
+    body = json.loads(body_unicode)
+    content = body['content']
+    print(f'{content=}')
+    models.Library.objects.create(
+        libraryName=content["libraryName"],
+        location=content["location"],
+        phone=content["phone"]
+    )
 
-@api_view(['GET'])
-def checkRoomAvailability(request, roomId):
-    reservations = list(models.Reservations.objects
-                        .filter(roomId=roomId, studentId=UNAVAILABLE)
-                        .values('date', 'startTime', 'endTime'))
-            
-    resp = {'availableTimes': reservations}
-    return Response(resp)
+    return Response()
 
 @api_view(['POST'])
 def create_room(request):
     """
-    Requires roomId, libraryName, type, minCapacity, maxCapacity
-    noiseLevel, openHour, closeHour, openMinute, closeMinute
+    Requires roomId, libraryName, room_type, minCapacity, maxCapacity
+    noiseLevel, openHour, openMinute, closeHour, closeMinute
     in request body 
     """
     body_unicode = request.body.decode('utf-8')
@@ -43,7 +50,7 @@ def create_room(request):
         models.Room.objects.create(
             roomId=content['roomId'],
             libraryName=library,
-            type=content["type"],
+            room_type=content["room_type"],
             minCapacity=content["minCapacity"],
             maxCapacity=content["maxCapacity"],
             noiseLevel=content["noiseLevel"],
@@ -55,11 +62,28 @@ def create_room(request):
 
     return Response()
 
+@api_view(['POST'])
+def create_student(request):
+    """
+    Requires studentId, email, phone in request body
+    """
+    body_unicode = request.body.decode('utf-8')
+    body = json.loads(body_unicode)
+    content = body['content']
+    print(f'{content=}')
+    models.Student.objects.create(
+        studentId=content["studentId"],
+        email=content["email"],
+        phone=content["phone"]
+    )
+
+    return Response()
 
 @api_view(['POST'])
 def create_reservation(request):
+    # TODO: rewrite this completely
     """
-    Requires roomId, libraryName, type, minCapacity, maxCapacity
+    Requires roomId, libraryName, room_type, minCapacity, maxCapacity
     noiseLevel, date, startHour, endHour, startMinute, endMinute
     in request body 
     """
@@ -67,7 +91,6 @@ def create_reservation(request):
     body = json.loads(body_unicode)
     content = body['content']
     print(f'{content=}')
-
 
     try:
         student = models.Student.objects.get(pk=content['studentId'])
@@ -83,7 +106,6 @@ def create_reservation(request):
     except models.Library.DoesNotExist as ex:
         raise ex
     
-    
     year, month, day = [int(x) for x in content['date'].split('-')]
     date_dt = datetime.date(year, month, day)
     startTime = datetime.time(content["startHour"], content["startMinute"])
@@ -91,8 +113,6 @@ def create_reservation(request):
     if date_dt < datetime.date.today() or \
         date_dt == datetime.date.today and startTime < datetime.datetime.now().time():
         raise ValueError("Requested date is already past")
-    
-    
     
     reservations = list(models.Reservations.objects.filter(
         studentId=None,
@@ -137,9 +157,9 @@ def create_reservation(request):
 
     return Response()
 
-
 @api_view(['DELETE'])
 def delete_reservation(request):
+    # TODO: rewrite this completely
     """
     Requires date, startHour, endHour, startMinute, endMinute, and studentId
     in request body 
@@ -149,13 +169,11 @@ def delete_reservation(request):
     content = body['content']
     print(f'{content=}')
 
-
     try:
         student = models.Student.objects.get(pk=content['studentId'])
         print(f'{student}')
     except models.Student.DoesNotExist as ex:
         raise ex
-    
     
     year, month, day = [int(x) for x in content['date'].split('-')]
     date_dt = datetime.date(year, month, day)
@@ -206,23 +224,15 @@ def delete_reservation(request):
 
     return Response()
 
-
-@api_view(['POST'])
-def create_library(request):
-    """
-    Requires libraryName, location, phone in request body
-    """
-    body_unicode = request.body.decode('utf-8')
-    body = json.loads(body_unicode)
-    content = body['content']
-    print(f'{content=}')
-    models.Library.objects.create(
-        libraryName=content["libraryName"],
-        location=content["location"],
-        phone=content["phone"]
-    )
-
-    return Response()
+@api_view(['GET'])
+def checkRoomAvailability(request, roomId):
+    # TODO: use helper function for retrieving results
+    reservations = list(models.Reservations.objects
+                        .filter(roomId=roomId, studentId=UNAVAILABLE)
+                        .values('date', 'startTime', 'endTime'))
+            
+    resp = {'availableTimes': reservations}
+    return Response(resp)
 
 @api_view(['GET'])
 def get_all_rooms(request):
@@ -232,11 +242,6 @@ def get_all_rooms(request):
 @api_view(['GET'])
 def get_all_reservations(request):
     res = models.Reservations.objects.all().values()
-    return Response(res)
-
-@api_view(['GET'])
-def get_all_active_reservations(request):
-    res = models.Reservations.objects.exclude(studentId_id=None).values()
     return Response(res)
 
 @api_view(['GET'])
@@ -279,73 +284,6 @@ def get_reservations_for_student_in_time_range(request,student_id,start_time,end
     ).values()
     return Response(res)
 
-@api_view(['POST'])
-def create_student(request):
-    """
-    Requires studentId, email, phone in request body
-    """
-    body_unicode = request.body.decode('utf-8')
-    body = json.loads(body_unicode)
-    content = body['content']
-    print(f'{content=}')
-    models.Student.objects.create(
-        studentId=content["studentId"],
-        email=content["email"],
-        phone=content["phone"]
-    )
-
-    return Response()
-
-# Raises a error, but still makes the objects.  Figure out later
-@api_view(['POST'])
-def adminUpdateBuffer(request):
-    today = datetime.date.today()
-    pastReservations = models.Reservations.objects.filter(date__lt=today).order_by('date')
-    earliest = pastReservations.first()
-    noEntries = False
-    if earliest is None:
-        daysElapsed = int(datetime.timedelta(days=TOTAL_BUFFER_DAYS).total_seconds()//86400)
-        noEntries = True
-    else:
-        daysElapsed = int((today - earliest.date)/datetime.timedelta(days=1))
-    
-    # Want to store/update this date every buffer update
-    # so don't have to query whole reservation set every time but not important rn
-    lastReservation = models.Reservations.objects.filter(date__gte=today).order_by('-date').first()
-    if lastReservation is None:
-        if noEntries:
-            latest = today
-        else:
-            return Response()
-    else:
-        latest = lastReservation.date + datetime.timedelta(days=daysElapsed)
-
-    rooms = models.Room.objects.all()
-    newReservations = []
-    for room in rooms:
-        for i in range(daysElapsed):
-            newReservations.append(models.Reservations.objects.create(               
-                libraryName=room.libraryName,
-                roomId=room.roomId,
-                date=latest + datetime.timedelta(days=i),
-                startTime=room.openTime,
-                endTime=room.closeTime,
-                studentId=None
-            ))
-    print(newReservations)
-    try:
-        models.Reservations.objects.bulk_create(newReservations)
-    except IntegrityError:
-        pass
-    
-    return Response()
-    
-@api_view(['DELETE'])
-def clearAllTimeSlots(request):
-    models.Reservations.objects.all().delete()
-    return Response()
-
-
 # get all reservations of a specific student 
 # sample url: http://localhost:8000/reservations/?studentId=123456
 @api_view(['GET'])
@@ -356,8 +294,11 @@ def get_all_reservations_for_a_student(request):
     studentId = request.GET.get('studentId')
     reservations = models.Reservations.objects.filter(studentId=studentId)
     return Response(reservations)
-    
 
+@api_view(['DELETE'])
+def clearAllTimeSlots(request):
+    models.Reservations.objects.all().delete()
+    return Response()
 
 @api_view(['GET'])
 def get_available_rooms(request):
