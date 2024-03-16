@@ -1,12 +1,12 @@
 import json
 from django.shortcuts import render
 from django.db.utils import IntegrityError
+from django.db.models import Q
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from . import models
 from .utils.fcns import *
 import datetime
-from datetime import datetime
 import random
 
 # Create your views here.
@@ -60,7 +60,7 @@ def create_room(request):
 def create_reservation(request):
     """
     Requires roomId, libraryName, type, minCapacity, maxCapacity
-    noiseLevel, startHour, endHour, startMinute, endMinute
+    noiseLevel, date, startHour, endHour, startMinute, endMinute
     in request body 
     """
     body_unicode = request.body.decode('utf-8')
@@ -141,7 +141,7 @@ def create_reservation(request):
 @api_view(['DELETE'])
 def delete_reservation(request):
     """
-    Requires startHour, endHour, startMinute, endMinute, and studentId
+    Requires date, startHour, endHour, startMinute, endMinute, and studentId
     in request body 
     """
     body_unicode = request.body.decode('utf-8')
@@ -357,4 +357,43 @@ def get_all_reservations_for_a_student(request):
     reservations = models.Reservations.objects.filter(studentId=studentId)
     return Response(reservations)
     
-    
+
+
+@api_view(['GET'])
+def get_available_rooms(request):
+    """
+    returns a QuerySet of rooms that are not booked within
+    a specified start and end time
+
+    Requires date, startHour, startMinute, endHour, endMinute
+        !date must be formatted as year-month-day
+    """
+    body_unicode = request.body.decode('utf-8')
+    body = json.loads(body_unicode)
+    content = body['content']
+    print(f'{content=}')
+
+    startTime = datetime.time(content["startHour"], content["startMinute"])
+    endTime = datetime.time(content["endHour"], content["endMinute"])
+
+    year, month, day = [int(x) for x in content['date'].split('-')]
+    rsrvDate = datetime.date(year, month, day)
+
+    """
+    conditions checked to determine if a room is unavailable:
+      the reservation starts within [startTime, endTime]
+      the reservation ends within [startTime, endTime]
+      the reservations starts before startTime and ends after endTime
+    """
+    unavailable = models.Reservations.objects.filter(
+        Q(  Q(startTime__gte = startTime, startTime__lte = endTime) 
+            | Q(endTime__gte = startTime, endTime__lte = endTime)
+            | Q(startTime__lte = startTime, endTime__gte = endTime)
+        ),
+        date=rsrvDate
+    ).values_list('roomId', flat=True)
+
+
+    available = models.Room.objects.all().exclude(roomId__in=unavailable)
+
+    return Response(available)
