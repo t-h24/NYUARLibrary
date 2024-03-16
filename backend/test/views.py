@@ -81,6 +81,7 @@ def create_student(request):
 
 @api_view(['POST'])
 def create_reservation(request):
+    # TODO: rewrite this completely
     """
     Requires roomId, libraryName, room_type, minCapacity, maxCapacity
     noiseLevel, date, startHour, endHour, startMinute, endMinute
@@ -158,6 +159,7 @@ def create_reservation(request):
 
 @api_view(['DELETE'])
 def delete_reservation(request):
+    # TODO: rewrite this completely
     """
     Requires date, startHour, endHour, startMinute, endMinute, and studentId
     in request body 
@@ -224,6 +226,7 @@ def delete_reservation(request):
 
 @api_view(['GET'])
 def checkRoomAvailability(request, roomId):
+    # TODO: use helper function for retrieving results
     reservations = list(models.Reservations.objects
                         .filter(roomId=roomId, studentId=UNAVAILABLE)
                         .values('date', 'startTime', 'endTime'))
