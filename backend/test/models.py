@@ -24,7 +24,7 @@ class Library(models.Model):
 class Room(models.Model):
     roomId = models.CharField(primary_key=True, max_length=10)
     libraryName = models.ForeignKey('Library', on_delete=models.CASCADE)
-    type = models.CharField(max_length=100)
+    room_type = models.CharField(max_length=100)
     minCapacity = models.IntegerField()
     maxCapacity = models.IntegerField()
     noiseLevel = models.IntegerField()
