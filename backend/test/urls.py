@@ -18,7 +18,7 @@ from django.urls import path, include
 from . import views
 
 urlpatterns = [
-    path('checkRoomAvailability/<slug:roomId>/', views.checkRoomAvailability),
+    path('checkRoomAvailability/<slug:roomId>/', views.check_room_availability),
     path('createRoom/', views.create_room),
     path('createLibrary/', views.create_library),
     path('createStudent/', views.create_student),
@@ -27,8 +27,7 @@ urlpatterns = [
     path('getAllReservations/active/', views.get_all_active_reservations),
     path('createReservation/', views.create_reservation),
     path('deleteReservation/', views.delete_reservation),
-    path('adminUpdateBuffer/', views.adminUpdateBuffer),
-    path('clearAllTimeSlots/', views.clearAllTimeSlots),
+    path('clearAllTimeSlots/', views.clear_all_time_slots),
     path('getReservationsInTimeRange/<str:start_time>/<str:end_time>/',views.get_reservations_in_time_range),
     path('getReservationsForStudentInTimeRange/<str:student_id>/<str:start_time>/<str:end_time>/',views.get_reservations_for_student_in_time_range),
     path('reservations/', views.get_all_reservations_for_a_student),

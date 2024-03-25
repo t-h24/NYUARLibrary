@@ -4,8 +4,7 @@ from django.db import models
 
 class Reservations(models.Model):
     reservationID = models.AutoField(primary_key=True)
-    libraryName = models.CharField(max_length=100)
-    roomId = models.CharField(max_length=10)
+    roomId = models.ForeignKey('Room', on_delete=models.CASCADE)
     date = models.DateField()
     startTime = models.TimeField()
     endTime = models.TimeField()

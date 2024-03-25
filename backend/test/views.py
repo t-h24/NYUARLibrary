@@ -11,10 +11,6 @@ import random
 
 # Create your views here.
 
-UNAVAILABLE = None
-MAX_RESERVATION_ID = 100000000
-TOTAL_BUFFER_DAYS = 5
-
 @api_view(['POST'])
 def create_library(request):
     """
@@ -24,6 +20,7 @@ def create_library(request):
     body = json.loads(body_unicode)
     content = body['content']
     print(f'{content=}')
+
     models.Library.objects.create(
         libraryName=content["libraryName"],
         location=content["location"],
@@ -43,6 +40,7 @@ def create_room(request):
     body = json.loads(body_unicode)
     content = body['content']
     print(f'{content=}')
+
     try:
         library = models.Library.objects.get(pk=content['libraryName'])
         openTime = datetime.time(content["openHour"], content["openMinute"])
@@ -71,6 +69,7 @@ def create_student(request):
     body = json.loads(body_unicode)
     content = body['content']
     print(f'{content=}')
+
     models.Student.objects.create(
         studentId=content["studentId"],
         email=content["email"],
@@ -219,18 +218,25 @@ def delete_reservation(request):
         right_reservations[0].delete()
     
     reservations[0].studentId = None
-    
     reservations[0].save()
 
     return Response()
 
 @api_view(['GET'])
-def checkRoomAvailability(request, roomId):
-    # TODO: use helper function for retrieving results
+def check_room_availability(request):
+    """
+    Requires roomId in request body
+    """
+    body_unicode = request.body.decode('utf-8')
+    body = json.loads(body_unicode)
+    content = body['content']
+    print(f'{content=}')
+
+    # TODO: use helper function for retrieving results (rewrite this)
     reservations = list(models.Reservations.objects
-                        .filter(roomId=roomId, studentId=UNAVAILABLE)
+                        .filter(roomId=content['roomId'], studentId=UNAVAILABLE)
                         .values('date', 'startTime', 'endTime'))
-            
+    
     resp = {'availableTimes': reservations}
     return Response(resp)
 
@@ -245,8 +251,16 @@ def get_all_reservations(request):
     return Response(res)
 
 @api_view(['GET'])
-def get_reservations_in_time_range(request,start_time,end_time):
-    print(start_time)
+def get_reservations_in_time_range(request):
+    # TODO rewrite this
+    """
+    Requires start_time, end_time in request body
+    """
+    body_unicode = request.body.decode('utf-8')
+    body = json.loads(body_unicode)
+    content = body['content']
+    print(f'{content=}')
+
     dt_start=dt_end=None
     try:
         dt_start=datetime.strptime(start_time,"%Y-%m-%dT%H:%M:%S")
@@ -265,7 +279,16 @@ def get_reservations_in_time_range(request,start_time,end_time):
     return Response(res)
 
 @api_view(['GET'])
-def get_reservations_for_student_in_time_range(request,student_id,start_time,end_time):
+def get_reservations_for_student_in_time_range(request):
+    # TODO rewrite this
+    """
+    Requires student_id, start_time, end_time in request body
+    """
+    body_unicode = request.body.decode('utf-8')
+    body = json.loads(body_unicode)
+    content = body['content']
+    print(f'{content=}')
+
     print(start_time)
     dt_start=dt_end=None
     try:
@@ -289,14 +312,18 @@ def get_reservations_for_student_in_time_range(request,student_id,start_time,end
 @api_view(['GET'])
 def get_all_reservations_for_a_student(request):
     """
-    Requires studentId as query string
+    Requires studentId in request body
     """
-    studentId = request.GET.get('studentId')
-    reservations = models.Reservations.objects.filter(studentId=studentId)
+    body_unicode = request.body.decode('utf-8')
+    body = json.loads(body_unicode)
+    content = body['content']
+    print(f'{content=}')
+
+    reservations = models.Reservations.objects.filter(studentId=content['studentId'])
     return Response(reservations)
 
 @api_view(['DELETE'])
-def clearAllTimeSlots(request):
+def clear_all_time_slots(request):
     models.Reservations.objects.all().delete()
     return Response()
 
@@ -306,7 +333,7 @@ def get_available_rooms(request):
     returns a QuerySet of rooms that are not booked within
     a specified start and end time
 
-    Requires date, startHour, startMinute, endHour, endMinute
+    Requires date, startHour, startMinute, endHour, endMinute in request body
         !date must be formatted as year-month-day
     """
     body_unicode = request.body.decode('utf-8')
