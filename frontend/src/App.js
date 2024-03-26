@@ -6,7 +6,7 @@ function App() {
   const [data, setData] = useState(null);
 
   useEffect(() => {
-    fetch('https://turbo-tribble-j9p556xqx64fqx9-8000.app.github.dev/connecttest/')
+    fetch('http://localhost:8000/connecttest/')
       .then(res => res.json())
       .then(data => setData(data.data));
   })

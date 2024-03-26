@@ -5,10 +5,10 @@ from django.db import models
 class Reservations(models.Model):
     reservationID = models.AutoField(primary_key=True)
     roomId = models.ForeignKey('Room', on_delete=models.CASCADE)
+    studentId = models.ForeignKey('Student', on_delete=models.CASCADE)
     date = models.DateField()
     startTime = models.TimeField()
     endTime = models.TimeField()
-    studentId = models.ForeignKey('Student', on_delete=models.CASCADE)
 
 class Student(models.Model):
     studentId = models.CharField(primary_key=True, max_length=10)
@@ -23,7 +23,7 @@ class Library(models.Model):
 class Room(models.Model):
     roomId = models.CharField(primary_key=True, max_length=10)
     libraryName = models.ForeignKey('Library', on_delete=models.CASCADE)
-    room_type = models.CharField(max_length=100)
+    roomType = models.CharField(max_length=100)
     minCapacity = models.IntegerField()
     maxCapacity = models.IntegerField()
     noiseLevel = models.IntegerField()
