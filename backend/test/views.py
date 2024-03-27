@@ -32,7 +32,7 @@ def create_library(request):
 @api_view(['POST'])
 def create_room(request):
     """
-    Requires roomId, libraryName, room_type, minCapacity, maxCapacity
+    Requires roomId, libraryName, roomType, minCapacity, maxCapacity
     noiseLevel, openHour, openMinute, closeHour, closeMinute
     in request body 
     """
@@ -48,7 +48,7 @@ def create_room(request):
         models.Room.objects.create(
             roomId=content['roomId'],
             libraryName=library,
-            room_type=content["room_type"],
+            roomType=content["roomType"],
             minCapacity=content["minCapacity"],
             maxCapacity=content["maxCapacity"],
             noiseLevel=content["noiseLevel"],
